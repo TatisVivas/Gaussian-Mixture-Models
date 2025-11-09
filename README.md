@@ -29,7 +29,7 @@ pip install -r requirements.txt
 ### Paso 2: Ejecutar el script
 
 ```bash
-python gmm_ejemplo_didactico.py
+python3 gmm_ejemplo_didactico.py
 ```
 
 O si estás usando Jupyter Notebook o VSCode, simplemente ejecuta las celdas o el archivo completo.
