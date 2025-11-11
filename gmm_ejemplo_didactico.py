@@ -112,7 +112,7 @@ print(f"Pesos de cada componente: {gmm.weights_}\n")
 y_pred = gmm.predict(X)
 print(f"Puntos asignados a cada cluster: {np.bincount(y_pred)}\n")
 
-# COMPARACIÓN CON K-MEANS (opcional, para demostrar la diferencia)
+# COMPARACIÓN CON K-MEANS (para demostrar la diferencia)
 # -----------------------------------------------------------------
 # K-means hace asignaciones rígidas: un punto pertenece a UN solo cluster.
 # GMM calcula probabilidades: un punto puede tener 60% cluster 1, 30% cluster 2, 10% cluster 3.
@@ -334,6 +334,60 @@ plt.savefig('gmm_visualizacion.png', dpi=300, bbox_inches='tight')  # Mantener n
 print("  ✓ Paso 3 guardado: 'gmm_paso3_visualizacion_final.png'")
 print("Visualización final guardada como 'gmm_visualizacion.png'\n")
 plt.show()
+
+# ============================================================================
+# BLOQUE 7B: VISUALIZACIÓN COMPARATIVA K-MEANS vs GMM
+# ============================================================================
+#
+# Mostramos lado a lado:
+# - IZQUIERDA: K-Means (asignación rígida + centroides)
+# - DERECHA: GMM (asignación + elipses de covarianza + medias)
+#
+print("Generando visualización comparativa: K-Means vs GMM...")
+
+fig_cmp, (axk, axg) = plt.subplots(1, 2, figsize=(16, 7))
+
+# --- SUBPLOT IZQUIERDO: K-MEANS ---
+for i, color in enumerate(colors):
+    mask_k = y_kmeans == i
+    axk.scatter(X[mask_k, 0], X[mask_k, 1], c=color, s=50,
+                alpha=0.6, edgecolors='black', linewidth=0.5,
+                label=f'Cluster {i+1} ({np.sum(mask_k)} puntos)')
+
+# Centroides K-Means
+centros_k = kmeans.cluster_centers_
+axk.scatter(centros_k[:, 0], centros_k[:, 1], c='black', s=160, marker='X',
+            linewidths=2, label='Centroides K-Means', zorder=6)
+
+axk.set_xlabel('Característica X', fontsize=12, fontweight='bold')
+axk.set_ylabel('Característica Y', fontsize=12, fontweight='bold')
+axk.set_title('K-Means: Asignación y Centroides', fontsize=13, fontweight='bold', pad=15)
+axk.legend(loc='upper right', fontsize=9, framealpha=0.9)
+axk.grid(True, alpha=0.3, linestyle='--')
+axk.set_aspect('equal', adjustable='box')
+
+# --- SUBPLOT DERECHO: GMM ---
+for i, (mean, covar, color) in enumerate(zip(gmm.means_, gmm.covariances_, colors)):
+    draw_ellipse(mean, covar, ax=axg, alpha=0.25, color=color, linewidth=2, linestyle='--')
+    axg.scatter(mean[0], mean[1], c=color, s=180, marker='x', linewidths=3,
+                label=f'Media GMM {i+1}', zorder=5)
+
+for i, color in enumerate(colors):
+    mask = y_pred == i
+    axg.scatter(X[mask, 0], X[mask, 1], c=color, s=50,
+                alpha=0.6, edgecolors='black', linewidth=0.5)
+
+axg.set_xlabel('Característica X', fontsize=12, fontweight='bold')
+axg.set_ylabel('Característica Y', fontsize=12, fontweight='bold')
+axg.set_title('GMM: Asignación, Elipses y Medias', fontsize=13, fontweight='bold', pad=15)
+axg.legend(loc='upper right', fontsize=9, framealpha=0.9)
+axg.grid(True, alpha=0.3, linestyle='--')
+axg.set_aspect('equal', adjustable='box')
+
+plt.tight_layout()
+plt.savefig('comparacion_kmeans_gmm.png', dpi=300, bbox_inches='tight')
+print("Visualización comparativa guardada como 'comparacion_kmeans_gmm.png'\n")
+plt.close(fig_cmp)
 
 # ============================================================================
 # BLOQUE 8: PROBABILIDADES DE PERTENENCIA (LA VENTAJA CLAVE DEL GMM)
